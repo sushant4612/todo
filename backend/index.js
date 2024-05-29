@@ -7,23 +7,28 @@ const app = express();
 app.use(express.json());
 
 app.post("/todo",async function(req, res) {
-    const createPayload = req.body;
-    const parsedPayload = createTodo.safeParse(createPayload);
-    if(!parsedPayload.success){
-        res.status(404).json({
-            msg : "You sent the wrong inputs"
+    try {
+        const createPayload = req.body;
+        const parsedPayload = createTodo.safeParse(createPayload);
+        if(!parsedPayload.success){
+            res.status(404).json({
+                msg : "You sent the wrong inputs"
+            })
+            return;
+        }
+        await Todo.create({
+            title: createPayload.title,
+            description: createPayload.description,
+            isCompleted: false
         })
-        return;
+    
+        res.json({
+            msg : "Todo created"
+        })
+    } catch (error) {
+        res.json(error)
+        
     }
-    await Todo.create({
-        title: createPayload.title,
-        description: createPayload.description,
-        isCompleted: false
-    })
-
-    res.json({
-        msg : "Todo created"
-    })
 })
 
 app.get("/todos",async function(req, res) {
